@@ -1,0 +1,10 @@
+{
+    "name": "ZeroToChad Website Time Tracker",
+    "description": "Chad is watching...",
+    "version": "1.0",
+    "manifest_version": 2,
+    "background": {
+        "service_worker": "js/background.js"
+      },
+    "permissions": ["storage", "webNavigation", "activeTab", "tabs", "http://localhost:3000/"]
+}

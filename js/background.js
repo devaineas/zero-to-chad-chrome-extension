@@ -3,6 +3,7 @@
 //and modified to fit ZeroToChad's needs.
 
 var dataSentUrlTrigger = "http://localhost:3000/"
+var cooldown = 0
 
 var map = {};
 var sites = "";
@@ -81,9 +82,11 @@ function setCurrent(url){
   } else {
     currentSite = trim(url);
     currentSiteStartTime = new Date();
-    if (url == dataSentUrlTrigger) {
+    if (url == dataSentUrlTrigger && cooldown == 0) { //url == dataSentUrlTrigger &&
+      cooldown = 1;
+      dataCooldown();
       sendData();
-      console.log("Send Data function called");
+      //console.log("Send Data function called");
     }
 
     //a(map); Got 32 gigs of ram? feel free to uncomment
@@ -115,6 +118,13 @@ function sendData() {
       }, function(results) {
           console.log(results[0]); //logs the extensions console
       });
+}
+
+function dataCooldown() { //sendData cooldown
+  setTimeout(function() {
+      cooldown = 0;
+      dataCooldown();
+  }, 600000); //10 mins
 }
 
 function scheduleReset() { //reset the map value at midnight everyday

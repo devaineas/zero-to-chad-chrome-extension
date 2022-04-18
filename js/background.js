@@ -2,7 +2,7 @@
 //https://github.com/utsavprabhakar/Time
 //and modified to fit ZeroToChad's needs.
 
-var dataSentUrlTrigger = "http://localhost:3000/"
+var dataSentUrlTrigger = "https://zero-to-chad.vercel.app/dashboard/website-usage-tracker" 
 var cooldown = 0
 
 var map = {};
@@ -18,7 +18,7 @@ class Site {
   }
 }
 
-chrome.tabs.onUpdated.addListener(function () { //(tabId, changeInfo, tab)
+chrome.tabs.onUpdated.addListener(function () {
     updateCurrentTime();
   }
 );
@@ -49,11 +49,11 @@ function update() {
     var then = Date.parse(currentSiteStartTime);
     var diff = (now - then) / 1000; 
     if (initial == null) {
-      var siteobj = new Site(currentSite, diff); //currentSite used twice here as its the url before its trimmed, so we can use that to define the CurrentUrl
+      var siteobj = new Site(currentSite, diff);
       map[currentSite] = siteobj;
     } else {
       initial.total_time = initial.total_time + diff;
-      map[currentSite] = new Site(currentSite, initial.total_time); //^
+      map[currentSite] = new Site(currentSite, initial.total_time); 
     }
     
   }
@@ -82,7 +82,7 @@ function setCurrent(url){
   } else {
     currentSite = trim(url);
     currentSiteStartTime = new Date();
-    if (url == dataSentUrlTrigger && cooldown == 0) { //url == dataSentUrlTrigger &&
+    if (url == dataSentUrlTrigger && cooldown == 0) {
       cooldown = 1;
       dataCooldown();
       sendData();
@@ -110,21 +110,22 @@ function trim(url) { //TODO: Fix this junk
 }
 
 function sendData() {
-      chrome.tabs.executeScript({
-          code: '(' + function(params) {
-              console.log(params); //logs the sites console 
-              return {success: true, response: "This is from webpage."};
-          } + ')(' + JSON.stringify(map) + ');'
-      }, function(results) {
-          console.log(results[0]); //logs the extensions console
-      });
+  chrome.tabs.executeScript({
+        code: '(' + function(params) {
+            localStorage.setItem('websitetracker', JSON.stringify(params)); 
+            //console.log(params); //logs the sites console 
+            return {success: true, response: "Sent data to website."};
+        } + ')(' + JSON.stringify(map) + ');' 
+    }, function(results) {
+        //console.log(results[0]);
+    });
 }
 
 function dataCooldown() { //sendData cooldown
   setTimeout(function() {
       cooldown = 0;
       dataCooldown();
-  }, 600000); //10 mins
+  }, 600000); //20s
 }
 
 function scheduleReset() { //reset the map value at midnight everyday
